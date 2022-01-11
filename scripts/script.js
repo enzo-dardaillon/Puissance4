@@ -3,6 +3,8 @@ let context;
 let tourJoueur;
 let grille;
 const headerHeight = 64;
+let caseWidth;
+let caseHeight;
 
 window.onload = function () {
     init();
@@ -12,16 +14,7 @@ window.onload = function () {
         const x = event.clientX - rect.left;
         let y = event.clientY - rect.top;
 
-        let i = 0;
-        while(grille[getCol(x)][i] === 2) {
-            i++;
-        }
-
-        grille[getCol(x)][i-1] = tourJoueur;
-
-        tourJoueur = (tourJoueur+1) % 2;
-
-        afficherGrille(grille);
+        placerJeton(tourJoueur, x);
 
         /*context.beginPath();
         context.arc(x, y, 16, 0, 2 * Math.PI, undefined);
@@ -51,10 +44,38 @@ function init() {
     canvas = document.getElementById("mycanvas");
     context = canvas.getContext("2d");
 
+    caseWidth = canvas.width/7;
+    caseHeight = (canvas.height-headerHeight)/6;
+
     tourJoueur = 1;
 
     grille = creerMatrice(7, 6);
     afficherGrille(grille);
+}
+
+function placerJeton(idPlayer, x) {
+    let i = 0;
+    while(grille[getCol(x)][i] === 2) {
+        i++;
+    }
+
+    if(i !== 0) {
+        grille[getCol(x)][i-1] = tourJoueur;
+
+        tourJoueur = (tourJoueur+1) % 2;
+        afficherGrille(grille);
+    }
+}
+
+function animationJeton(idPlayer, x, currentY, destinationY) {
+    if(currentY < destinationY) {
+        grille[getCol(x)][destinationY/caseHeight] = tourJoueur;
+
+        tourJoueur = (tourJoueur+1) % 2;
+        afficherGrille(grille);
+    } else {
+        window.requestAnimationFrame(animationJeton(idPlayer, x, currentY+1, destinationY));
+    }
 }
 
 //MATHS FUNCTIONS
@@ -99,8 +120,6 @@ function afficherGrille(grille) {
     context.fillStyle = "#0000FF"
     context.fillRect(0, headerHeight, canvas.width, canvas.height);
 
-    const caseWidth = canvas.width/7;
-    const caseHeight = (canvas.height-headerHeight)/6;
     const circleRadius = 32;
     const xoffset = 4;
     const yoffset = 8;
