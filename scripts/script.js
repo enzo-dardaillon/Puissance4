@@ -1,26 +1,25 @@
 let canvas;
 let context;
-let tourJoueur = 1;
+let tourJoueur;
 let grille;
 const headerHeight = 64;
 
 window.onload = function () {
-    canvas = document.getElementById("mycanvas");
-    context = canvas.getContext("2d");
-
-    grille = creerMatrice(10, 10);
-    console.log(grille);
-
-    afficherGrille(grille);
+    init();
 
     canvas.addEventListener("click", function (event) {
-        const rect = canvas.getBoundingClientRect()
-        const x = event.clientX - rect.left
-        const y = event.clientY - rect.top
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        let y = event.clientY - rect.top;
 
-        grille[getCol(x)][getRow(y)] = tourJoueur;
+        let i = 0;
+        while(grille[getCol(x)][i] === 2) {
+            i++;
+        }
 
-        tourJoueur = (tourJoueur+1) % 2
+        grille[getCol(x)][i-1] = tourJoueur;
+
+        tourJoueur = (tourJoueur+1) % 2;
 
         afficherGrille(grille);
 
@@ -41,7 +40,21 @@ window.onload = function () {
         context.arc(x, 32, 32, 0, 2 * Math.PI, undefined);
         context.fillStyle = tourJoueur === 0 ? "#FFFF00" : "#FF0000";
         context.fill();
-    })
+    });
+
+    document.getElementById("button_reset").onclick = function (event) {
+        init();
+    }
+}
+
+function init() {
+    canvas = document.getElementById("mycanvas");
+    context = canvas.getContext("2d");
+
+    tourJoueur = 1;
+
+    grille = creerMatrice(7, 6);
+    afficherGrille(grille);
 }
 
 //MATHS FUNCTIONS
