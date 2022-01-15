@@ -5,6 +5,7 @@ let grille;
 const headerHeight = 64;
 let caseWidth;
 let caseHeight;
+let gameRunning = true;
 
 window.onload = function () {
     init();
@@ -50,6 +51,9 @@ function init() {
     tourJoueur = 1;
 
     grille = creerMatrice(7, 6);
+
+    document.getElementById("subtitle").innerText = "Jeu en cours";
+    gameRunning = true;
     afficherGrille(grille);
 }
 
@@ -60,20 +64,21 @@ function init() {
  * @param x est la colonne sur laquelle on dépose le jeton
  */
 function placerJeton(idPlayer, x) {
-    let i = 0;
-    while(grille[getCol(x)][i] === 2) {
-        i++;
-    }
+    if(gameRunning){
+        let i = 0;
+        while(grille[getCol(x)][i] === 2) {
+            i++;
+        }
 
-    if(i !== 0) {
-        grille[getCol(x)][i-1] = tourJoueur;
+        if(i !== 0) {
+            grille[getCol(x)][i-1] = tourJoueur;
 
-        tourJoueur = (tourJoueur+1) % 2;
-        afficherGrille(grille);
-        const playerWin = detectWin();
-        if(playerWin !== 2) {
-            console.log(playerWin);
-            init();
+            tourJoueur = (tourJoueur+1) % 2;
+            afficherGrille(grille);
+            const playerWin = detectWin();
+            if(playerWin !== 2) {
+                finish(playerWin);
+            }
         }
     }
 }
@@ -127,7 +132,6 @@ function detectWin() {
                 for (let i = 0; i < 4; i++) {
                     if(getCaseFromGrid(x, y+i) !== player) break;
                     if(i === 3 && player !== 2 && getCaseFromGrid(x, y+i) === player) {
-                        console.log("Gain en colonne : " + x + ',' + y);
                         return player;
                     }
                 }
@@ -138,7 +142,6 @@ function detectWin() {
                 for (let i = 0; i < 4; i++) {
                     if(getCaseFromGrid(x+i, y) !== player) break;
                     if(i === 3 && player !== 2 && getCaseFromGrid(x+i, y) === player) {
-                        console.log("Gain en ligne : " + x + ',' + y);
                         return player;
                     }
                 }
@@ -149,7 +152,6 @@ function detectWin() {
                 for (let i = 0; i < 4; i++) {
                     if(getCaseFromGrid(x+i, y+i) !== player) break;
                     if(i === 3 && player !== 2 && getCaseFromGrid(x+i, y+i) === player) {
-                        console.log("Gain en diagonale 1 : " + x + ',' + y);
                         return player;
                     }
                 }
@@ -160,7 +162,6 @@ function detectWin() {
                 for (let i = 0; i < 4; i++) {
                     if(getCaseFromGrid(x+i, y-i) !== player) break;
                     if(i === 3 && player !== 2 && getCaseFromGrid(x+i, y-i) === player) {
-                        console.log("Gain en diagonale 2 : " + x + ',' + y);
                         return player;
                     }
                 }
@@ -168,6 +169,12 @@ function detectWin() {
         }
     }
     return 2;
+}
+
+function finish(idPlayerWin) {
+    gameRunning = false;
+    document.getElementById("subtitle").innerText =
+        idPlayerWin === 0 ? "Victoire du joueur jaune !" : "Victoire du joueur rouge !";
 }
 
 /**
