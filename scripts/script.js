@@ -53,6 +53,12 @@ function init() {
     afficherGrille(grille);
 }
 
+/**
+ * TODO Intégrer une animation ???
+ *
+ * @param idPlayer est le joueur qui dépose son jeton
+ * @param x est la colonne sur laquelle on dépose le jeton
+ */
 function placerJeton(idPlayer, x) {
     let i = 0;
     while(grille[getCol(x)][i] === 2) {
@@ -64,18 +70,16 @@ function placerJeton(idPlayer, x) {
 
         tourJoueur = (tourJoueur+1) % 2;
         afficherGrille(grille);
+        const playerWin = detectWin();
+        if(playerWin !== 2) {
+            console.log(playerWin);
+            init();
+        }
     }
 }
 
 function animationJeton(idPlayer, x, currentY, destinationY) {
-    if(currentY < destinationY) {
-        grille[getCol(x)][destinationY/caseHeight] = tourJoueur;
 
-        tourJoueur = (tourJoueur+1) % 2;
-        afficherGrille(grille);
-    } else {
-        window.requestAnimationFrame(animationJeton(idPlayer, x, currentY+1, destinationY));
-    }
 }
 
 //MATHS FUNCTIONS
@@ -84,6 +88,14 @@ function round(number, increment, offset) {
 }
 
 //CREATION MATRICE
+
+/**
+ * Créer une grille de jeu
+ *
+ * @param di est le nombre de colonnes
+ * @param dj est le nombre de ligne
+ * @returns {*[]} une grille de jeu
+ */
 function creerMatrice(di, dj) {
     let matrice = [];
 
@@ -97,24 +109,104 @@ function creerMatrice(di, dj) {
     return matrice;
 }
 
+/**
+ *
+ * @returns {number} l'id du joueur vainqueur, 2 si personne n'a encore gagné
+ */
+function detectWin() {
+    let playerWin = 2;
+    //Parcours de la grille de jeu
+    for (let x = 0; x < 7; x++) {
+        for (let y = 0; y < 6; y++) {
+            //On recupère la couleur de la case courante
+            const player = getCaseFromGrid(x, y);
+            if(player === 2) continue;
+
+            //On teste la colonne
+            if(y <= 2) { //Inutile d'aller plus loin que les 3 premières lignes
+                for (let i = 0; i < 4; i++) {
+                    if(getCaseFromGrid(x, y+i) !== player) break;
+                    if(i === 3 && player !== 2 && getCaseFromGrid(x, y+i) === player) {
+                        console.log("Gain en colonne : " + x + ',' + y);
+                        return player;
+                    }
+                }
+            }
+
+            //On teste la ligne
+            if(x <= 3) { //Inutile d'aller plus loin que les 4 premières colonnes
+                for (let i = 0; i < 4; i++) {
+                    if(getCaseFromGrid(x+i, y) !== player) break;
+                    if(i === 3 && player !== 2 && getCaseFromGrid(x+i, y) === player) {
+                        console.log("Gain en ligne : " + x + ',' + y);
+                        return player;
+                    }
+                }
+            }
+
+            //On teste la diagonale ⤡
+            if(x <= 3 && y <= 2) { //Inutile d'aller plus loin que les 3 premières lignes et les 4 premières colonnes
+                for (let i = 0; i < 4; i++) {
+                    if(getCaseFromGrid(x+i, y+i) !== player) break;
+                    if(i === 3 && player !== 2 && getCaseFromGrid(x+i, y+i) === player) {
+                        console.log("Gain en diagonale 1 : " + x + ',' + y);
+                        return player;
+                    }
+                }
+            }
+
+            //On teste la diagonale ⤢
+            if(x <= 3 && y >= 3) {
+                for (let i = 0; i < 4; i++) {
+                    if(getCaseFromGrid(x+i, y-i) !== player) break;
+                    if(i === 3 && player !== 2 && getCaseFromGrid(x+i, y-i) === player) {
+                        console.log("Gain en diagonale 2 : " + x + ',' + y);
+                        return player;
+                    }
+                }
+            }
+        }
+    }
+    return 2;
+}
+
+/**
+ * Cette méthode permet de connaître la colonne en fonction d'un point 1D passé en paramètre.
+ * Un exemple d'implémentation serait de faire passer le curseur de la souris en paramètre pour savoir quelle colonne le joueur pointe.
+ * @param x est la position (sur la longueur) à l'écran choisie.
+ * @returns {number} la colonne choisie
+ */
 function getCol(x) {
     return round(x, canvas.width/7, 0) / (canvas.width/7)-1;
 }
+
+/**
+ * Cette méthode permet de connaître la ligne en fonction d'un point 1D passé en paramètre.
+ * Un exemple d'implémentation serait de faire passer le curseur de la souris en paramètre pour savoir quelle ligne le joueur pointe.
+ * @param y est la position (sur la hauteur) à l'écran choisie.
+ * @returns {number} la ligne choisie
+ */
 function getRow(y) {
     return round(y, canvas.height/7, 0) / (canvas.height/7)-2;
 }
 
+function getCaseFromPixel(x, y) {
+    return grille[getCol(x)][getRow(y)];
+}
+
+function getCaseFromGrid(x, y) {
+    return grille[x][y];
+}
+
 //VIEW FUNCTIONS
+/**
+ * Efface le canvas.
+ * Utile pour afficher des animations ou actualiser le plateau de jeu
+ */
 function clearScreen() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-/*******7
-*
-*
-*
-6
- */
 function afficherGrille(grille) {
     clearScreen();
     context.fillStyle = "#0000FF"
