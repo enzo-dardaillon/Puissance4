@@ -11,7 +11,7 @@ class Controller {
 
         this.joueurs = [];
         this.joueurs[0] = new Player(0, "#FF0000");
-        this.joueurs[1] = new Player(1, "#FFFF00");
+        this.joueurs[1] = new PlayerIA(1, "#FFFF00");
 
         this.view.canvas.addEventListener("click", this.placerJeton.bind(this));
 
@@ -19,7 +19,7 @@ class Controller {
     }
 
     init() {
-        this.tourJoueur = 1;
+        this.tourJoueur = 0;
 
         this.plateau.resetMatrice();
 
@@ -32,23 +32,36 @@ class Controller {
         this.view.afficherGrille(this.plateau);
     }
 
+    nextTurn() {
+        this.detectWin();
+
+        this.tourJoueur = (this.tourJoueur+1) % 2;
+
+        const currentPlayer = this.joueurs[this.tourJoueur];
+        if(currentPlayer.isIA) {
+            currentPlayer.placerJetonFromGrid(this.plateau);
+            this.nextTurn();
+        }
+    }
+
     placerJeton(event) {
         if(this.gameRunning){
             const rect = this.view.canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             //let y = event.clientY - rect.top;
 
-            this.joueurs[this.tourJoueur].placerJeton(this.plateau, x);
+            this.joueurs[this.tourJoueur].placerJetonFromPixel(this.plateau, x);
 
             this.view.afficherGrille(this.plateau);
 
+            this.nextTurn();
+        }
+    }
 
-            const playerWin = this.plateau.detectWin();
-            if(playerWin !== 2) {
-                this.finish(playerWin);
-            }
-
-            this.tourJoueur = (this.tourJoueur+1) % 2;
+    detectWin() {
+        const playerWin = this.plateau.detectWin();
+        if(playerWin !== 2) {
+            this.finish(playerWin);
         }
     }
 
