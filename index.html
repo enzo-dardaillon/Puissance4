@@ -4,12 +4,21 @@
     <meta charset="UTF-8">
     <title>Puissance 4</title>
     <link rel="stylesheet" href="css/style.css" />
-    <script src="scripts/script.js"></script>
+    <!--<script src="scripts/script.js"></script>-->
+    <script src="scripts/MathsUtils.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/models/plateau.js"></script>
+    <script src="scripts/models/jeton.js"></script>
+    <script src="scripts/models/player.js"></script>
+    <script src="scripts/views/view.js"></script>
+    <script src="scripts/controllers/controller.js"></script>
 </head>
 <body>
     <h1>Puissance 4</h1>
     <h2 id="subtitle">Jeu en cours</h2>
-    <canvas id="mycanvas" style="border: black dashed thin;" width="500" height="500"></canvas>
+    <div id="div_game">
+        <canvas id="mycanvas" style="border: black dashed thin;" width="500" height="500"></canvas>
+    </div>
     <input id="button_reset" type="button" value="Reset">
 </body>
 </html>
