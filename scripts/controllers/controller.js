@@ -82,7 +82,7 @@ class Controller {
     }
 
     afficherJetonAvantPlacement(event) {
-        if(!this.getCurrentPlayer().isIA){
+        if(this.gameRunning && !this.getCurrentPlayer().isIA){
             this.view.afficherGrille(this.plateau);
 
             const rect = this.view.canvas.getBoundingClientRect()
