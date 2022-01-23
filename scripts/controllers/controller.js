@@ -15,7 +15,7 @@ class Controller {
 
         this.view.canvas.addEventListener("click", this.placerJeton.bind(this));
 
-        this.view.canvas.addEventListener("mousemove", this.afficher.bind(this));
+        this.view.canvas.addEventListener("mousemove", this.afficherJetonAvantPlacement.bind(this));
     }
 
     init() {
@@ -32,29 +32,45 @@ class Controller {
         this.view.afficherGrille(this.plateau);
     }
 
-    nextTurn() {
-        this.detectWin();
+    botTurn(player) {
+        player.placerJetonFromGrid(this.plateau);
+        this.view.afficherGrille(this.plateau);
+        this.nextTurn();
+    }
 
+    nextTurn() {
         this.tourJoueur = (this.tourJoueur+1) % 2;
 
-        const currentPlayer = this.joueurs[this.tourJoueur];
-        if(currentPlayer.isIA) {
-            currentPlayer.placerJetonFromGrid(this.plateau);
-            this.nextTurn();
+        if(this.getCurrentPlayer().isIA) {
+            setTimeout(this.botTurn.bind(this), 500, this.getCurrentPlayer());
         }
     }
 
+    getCurrentPlayer() {
+        return this.joueurs[this.tourJoueur];
+    }
+
+    getNextPlayer() {
+        return this.joueurs[(this.tourJoueur+1) % 2];
+    }
+
     placerJeton(event) {
-        if(this.gameRunning){
+        if(this.gameRunning && !this.getCurrentPlayer().isIA){
             const rect = this.view.canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             //let y = event.clientY - rect.top;
 
-            this.joueurs[this.tourJoueur].placerJetonFromPixel(this.plateau, x);
+            this.getCurrentPlayer().placerJetonFromPixel(this.plateau, x);
 
             this.view.afficherGrille(this.plateau);
 
-            this.nextTurn();
+            this.detectWin();
+
+            if(this.gameRunning){
+                this.nextTurn();
+                //if(this.getNextPlayer().isIA) setTimeout(this.nextTurn.bind(this), 500);
+                //else this.nextTurn();
+            }
         }
     }
 
@@ -65,16 +81,18 @@ class Controller {
         }
     }
 
-    afficher(event) {
-        this.view.afficherGrille(this.plateau);
+    afficherJetonAvantPlacement(event) {
+        if(!this.getCurrentPlayer().isIA){
+            this.view.afficherGrille(this.plateau);
 
-        const rect = this.view.canvas.getBoundingClientRect()
-        const x = round(event.clientX - rect.left, this.view.canvas.width/7, 0)-36;
+            const rect = this.view.canvas.getBoundingClientRect()
+            const x = round(event.clientX - rect.left, this.view.canvas.width/7, 0)-36;
 
-        this.view.context.beginPath();
-        this.view.context.arc(x, 32, 32, 0, 2 * Math.PI, undefined);
-        this.view.context.fillStyle = this.tourJoueur === 0 ? "#FFFF00" : "#FF0000";
-        this.view.context.fill();
+            this.view.context.beginPath();
+            this.view.context.arc(x, 32, 32, 0, 2 * Math.PI, undefined);
+            this.view.context.fillStyle = this.tourJoueur === 0 ? "#FFFF00" : "#FF0000";
+            this.view.context.fill();
+        }
     }
 
     finish(idPlayerWin) {
