@@ -2,24 +2,37 @@ class Controller {
     plateau;
     view;
     joueurs;
-    tourJoueur;
+    tourJoueur = 2;
     gameRunning;
+    blinkHolder;
 
     constructor(plateau, view) {
         this.plateau = plateau;
         this.view = view;
 
-        this.joueurs = [];
-        this.joueurs[0] = new Player(0, "#FF0000");
-        this.joueurs[1] = new PlayerIA(1, "#FFFF00");
-
         this.view.canvas.addEventListener("click", this.placerJeton.bind(this));
-
+        document.getElementById("button_ia").addEventListener("click", this.blinkResetButton.bind(this));
+        document.getElementById("button_first_player").addEventListener("click", this.changeFirstPlayer.bind(this));
         this.view.canvas.addEventListener("mousemove", this.afficherJetonAvantPlacement.bind(this));
     }
 
     init() {
-        this.tourJoueur = 0;
+        document.getElementById("button_reset").value = 'Reset';
+        if(this.blinkHolder !== null){
+            clearInterval(this.blinkHolder);
+            document.getElementById("button_reset").style.backgroundColor = '#ccc';
+        }
+
+        this.joueurs = [];
+        this.joueurs[0] = new Player(0, "#FF0000");
+
+        if(document.getElementById("button_ia").checked) {
+            this.joueurs[1] = new PlayerIA(1, "#FFFF00");
+        } else {
+            this.joueurs[1] = new Player(1, "#FFFF00");
+        }
+
+        if(this.tourJoueur === 2) this.tourJoueur = 0;
 
         this.plateau.resetMatrice();
 
@@ -35,7 +48,12 @@ class Controller {
     botTurn(player) {
         player.placerJetonFromGrid(this.plateau);
         this.view.afficherGrille(this.plateau);
-        this.nextTurn();
+
+        this.detectWin();
+
+        if(this.gameRunning) {
+            this.nextTurn();
+        }
     }
 
     nextTurn() {
@@ -93,6 +111,21 @@ class Controller {
             this.view.context.fillStyle = this.tourJoueur === 0 ? "#FFFF00" : "#FF0000";
             this.view.context.fill();
         }
+    }
+
+    blinkResetButton(event) {
+        this.blinkHolder = setInterval(function () {
+            let resetButton = document.getElementById("button_reset");
+            console.log(resetButton.style.backgroundColor);
+            resetButton.style.backgroundColor = (resetButton.style.backgroundColor === 'red' ? '#ccc' : 'red');
+        }, 500);
+    }
+
+    changeFirstPlayer(event) {
+        this.tourJoueur = (this.tourJoueur+1) % 2;
+
+        document.getElementById("label_button_first_player").style.backgroundColor =
+            (this.tourJoueur === 0 ? "#FFFF00" : "#FF0000");
     }
 
     finish(idPlayerWin) {

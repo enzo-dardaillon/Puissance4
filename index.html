@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Puissance 4</title>
     <link rel="stylesheet" href="css/style.css" />
-    <!--<script src="scripts/script.js"></script>-->
     <script src="scripts/MathsUtils.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/models/plateau.js"></script>
@@ -16,10 +15,25 @@
 </head>
 <body>
     <h1>Puissance 4</h1>
-    <h2 id="subtitle">Jeu en cours</h2>
-    <div id="div_game">
-        <canvas id="mycanvas" style="border: black dashed thin;" width="500" height="500"></canvas>
+    <div>
+        <section>
+            <label class="switch">
+                <input id="button_ia" type="checkbox" />
+                <span class="slider round"></span>
+            </label>
+            <span>Activer IA ?</span>
+            <br>
+            <label class="switch">
+                <input id="button_first_player" type="checkbox" />
+                <span id="label_button_first_player" class="slider round"></span>
+            </label>
+            <span>Premier joueur ?</span>
+            <input id="button_reset" type="button" value="Commencer la partie" />
+        </section>
+        <div id="div_game">
+            <h2 id="subtitle">Jeu en cours</h2>
+            <canvas id="mycanvas" style="border: black dashed thin;" width="500" height="500"></canvas>
+        </div>
     </div>
-    <input id="button_reset" type="button" value="Reset">
 </body>
 </html>
