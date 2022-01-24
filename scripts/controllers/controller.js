@@ -46,6 +46,7 @@ class Controller {
     }
 
     botTurn(player) {
+        console.log(this.plateau);
         player.placerJetonFromGrid(this.plateau);
         this.view.afficherGrille(this.plateau);
 
