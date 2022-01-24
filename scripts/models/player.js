@@ -3,11 +3,17 @@ class Player {
     color;
     isIA;
     animationHandler;
+    jetonX;
+    jetonY;
 
     constructor(id, color) {
         this.id = id;
         this.color = color;
         this.isIA = false;
+    }
+
+    getColor(){
+        return this.color;
     }
 
     /**
@@ -21,17 +27,15 @@ class Player {
             i++;
         }
 
-        this.animationHandler = setInterval(this.animationJeton, 10, plateau, x, i, 0, 0);
-
         if(i !== 0) {
             plateau.grille[plateau.getCol(x)][i-1] = this.id;
         }
     }
 
     animationJeton(plateau, x, destY, currY) {
-        if(destY === currY) clearInterval(this.animationHandler);
-
-        currY--;
+        if(destY <= currY) clearInterval(this.animationHandler);
+        currY++;
+        console.log(currY + "=>" + destY);
     }
 
     placerJetonFromGrid(plateau, x) {
