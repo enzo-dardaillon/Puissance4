@@ -24,13 +24,12 @@ class Controller {
         }
 
         this.joueurs = [];
-        this.joueurs[0] = new Player(0, "#FFFF00");
+        this.joueurs[0] = new Player(0, "#FF0000");
 
         if(document.getElementById("button_ia").checked) {
-            this.joueurs[1] = new PlayerIA(1, "#FF0000");
-            this.botTurn(this.getCurrentPlayer());
+            this.joueurs[1] = new PlayerIA(1, "#FFFF00");
         } else {
-            this.joueurs[1] = new Player(1, "#FF0000");
+            this.joueurs[1] = new Player(1, "#FFFF00");
         }
 
         if(this.tourJoueur === 2) this.tourJoueur = 0;
@@ -80,7 +79,7 @@ class Controller {
             const x = event.clientX - rect.left;
             //let y = event.clientY - rect.top;
 
-            this.view.animationJetonFromPixel(this.plateau, x, this.plateau.getCaseDispo(x)*CANVAS_HEIGHT/7, this.getCurrentPlayer());
+            this.getCurrentPlayer().placerJetonFromPixel(this.plateau, x);
 
             this.view.afficherGrille(this.plateau);
 
@@ -103,7 +102,7 @@ class Controller {
 
     afficherJetonAvantPlacement(event) {
         if(this.gameRunning && !this.getCurrentPlayer().isIA){
-            this.view.clearHeader();
+            this.view.afficherGrille(this.plateau);
 
             const rect = this.view.canvas.getBoundingClientRect()
             const x = round(event.clientX - rect.left, this.view.canvas.width/7, 0)-36;
@@ -116,7 +115,6 @@ class Controller {
     }
 
     blinkResetButton(event) {
-        clearInterval(this.blinkHolder);
         this.blinkHolder = setInterval(function () {
             let resetButton = document.getElementById("button_reset");
             console.log(resetButton.style.backgroundColor);
