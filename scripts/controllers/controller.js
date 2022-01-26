@@ -5,6 +5,7 @@ class Controller {
     tourJoueur = 2;
     gameRunning;
     blinkHolder;
+    gameLock = false;
 
     constructor(plateau, view) {
         this.plateau = plateau;
@@ -74,23 +75,32 @@ class Controller {
     }
 
     placerJeton(event) {
-        if(this.gameRunning && !this.getCurrentPlayer().isIA){
+        if(!this.gameLock && this.gameRunning && !this.getCurrentPlayer().isIA){
+            this.gameLock = true;
             const rect = this.view.canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             //let y = event.clientY - rect.top;
 
             //this.getCurrentPlayer().placerJetonFromPixel(this.plateau, x);
-            this.view.animationJetonFromPixel(this.plateau, x, this.plateau.getCaseDispo(x)*CANVAS_HEIGHT/7, this.getCurrentPlayer());
+            this.view.animationJetonFromPixel(this.plateau,
+                x,
+                this.plateau.getCaseDispo(x)*CANVAS_HEIGHT/7,
+                this.getCurrentPlayer(),
+                this.testApresPlacement.bind(this));
+        }
+    }
 
-            this.view.afficherGrille(this.plateau);
+    testApresPlacement() {
+        this.view.afficherGrille(this.plateau);
 
-            this.detectWin();
+        this.detectWin();
 
-            if(this.gameRunning){
-                this.nextTurn();
-                //if(this.getNextPlayer().isIA) setTimeout(this.nextTurn.bind(this), 500);
-                //else this.nextTurn();
-            }
+        this.gameLock = false;
+
+        if(this.gameRunning){
+            this.nextTurn();
+            //if(this.getNextPlayer().isIA) setTimeout(this.nextTurn.bind(this), 500);
+            //else this.nextTurn();
         }
     }
 
@@ -102,7 +112,7 @@ class Controller {
     }
 
     afficherJetonAvantPlacement(event) {
-        if(this.gameRunning && !this.getCurrentPlayer().isIA){
+        if(!this.gameLock && this.gameRunning && !this.getCurrentPlayer().isIA){
             this.view.afficherGrille(this.plateau);
 
             const rect = this.view.canvas.getBoundingClientRect()

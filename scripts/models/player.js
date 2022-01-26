@@ -15,7 +15,7 @@ class Player {
     }
 
     /**
-     * TODO Intégrer une animation ???
+     *
      * @param plateau est le plateau de jeu sur lequel placer le jeton
      * @param x est la colonne sur laquelle on dépose le jeton
      */

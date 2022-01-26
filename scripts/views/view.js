@@ -26,7 +26,7 @@ class View {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    animationJetonFromPixel(plateau, x, destY, player) {
+    animationJetonFromPixel(plateau, x, destY, player, callback) {
         x = round(x, CANVAS_WIDTH/7, 0) - CANVAS_WIDTH/7;
         /*console.log(destY);
         destY = round(destY, CANVAS_HEIGHT/7, 0) - 2*(CANVAS_HEIGHT/7);
@@ -43,6 +43,7 @@ class View {
                 this.clearScreen();
                 player.placerJetonFromPixel(plateau, x+1);
                 clearInterval(handler);
+                callback();
             } else if(!bounced && currY >= destY) {
                 vy = -vy/1.25;
                 vy+=ay;
