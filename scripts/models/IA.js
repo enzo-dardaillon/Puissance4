@@ -1,7 +1,8 @@
 class PlayerIA extends Player {
 
     playablePositions;
-    scores = new Array(7);
+    scoresDefense = new Array(7);
+    scoresAttack = new Array(7);
     position;
 
     constructor(id, color) {
@@ -12,67 +13,126 @@ class PlayerIA extends Player {
     findPossiblePositions (plateau)
     {
         let y = 0;
-        let possiblePositions = [];
+        let possiblePositions = [0, 0, 0, 0, 0, 0, 0];
         for (let x = 0 ; x < 7 ; ++x) {
             while (y < 6 && plateau.getCaseFromGrid(x, y) === 2) {
                 y++;
             }
-            let myJeton = new Jeton(x, y-1);
-            possiblePositions.push(myJeton);
+            if (y > 0) possiblePositions[x] = new Jeton(x, y-1);
             y = 0;
         }
         return possiblePositions;
     }
 
-    evaluatePlayablePositions (aJeton = new Jeton(), plateau) {
+    getRandomPlayablePos ()
+    {
+        let random = this.playablePositions[Math.floor(Math.random() * this.playablePositions.length)];
+        if (random instanceof Jeton) {
+            console.log(random);
+            return random;
+        }
+        else this.getRandomPlayablePos();
+    }
+
+    evaluatePlayablePositions (aJeton = new Jeton(), plateau, colour) {
         let score = 0;
         let x = aJeton.x;
         let y = aJeton.y;
         let neighborhood = aJeton.getNeighbours();
-        console.log(aJeton);
-        //0 : g | 1 : gb | 2 : d | 3 : db | 4 : b
         for (let i = 0 ; i < neighborhood.length ; ++i)
         {
-            console.log(neighborhood[i]);
+            let currentScore = 0;
             if (neighborhood[i] === 0) {
-                console.log("c'est egale a 0");
                 continue;
             }
             if (neighborhood[i] instanceof Jeton) {
-                console.log("couleur : " + neighborhood[i].getColor(plateau));
-                if (neighborhood[i].getColor(plateau) === 0) {
+                if (neighborhood[i].getColor(plateau) === colour) {
                     let children = neighborhood[i].getNeighbours();
-                    score += 10;
-                    console.log(score);
+                    score += 5;
                     if (children[i] === 0) {
-                        console.log("c'est egale a 0");
                         continue;
                     }
-                    if (children[i].getColor(plateau) === 0) {
+                    if (children[i].getColor(plateau) === colour) {
                         children = children[i].getNeighbours();
-                        score += 10;
-                        console.log(score);
+                        score += 5;
+                        if (i !== 3 && aJeton.getColorOpposed(plateau, i) === colour) {
+                            score += 10;
+                        }
                         if (children[i] === 0) {
-                            console.log("c'est egale a 0");
                             continue;
                         }
-                        if (children[i].getColor(plateau) === 0) {
+                        if (children[i].getColor(plateau) === colour) {
                             score += 10;
-                            console.log(score);
                         }
                     }
                 }
             }
+            if (currentScore > score) score = currentScore;
         }
         return score;
     }
 
-    scoreAssigment (plateau) {
+    scoreAssigment (plateau, colour) {
         let tabScores = [0, 0, 0, 0, 0, 0, 0];
         for (let i = 0 ; i < this.playablePositions.length ; ++i) {
-            tabScores[i] = this.evaluatePlayablePositions(this.playablePositions[i], plateau);
+            if (this.playablePositions[i] instanceof Jeton)
+                tabScores[i] = this.evaluatePlayablePositions(this.playablePositions[i], plateau, colour);
+            else {
+                tabScores[i] = 0;
+            }
         }
         return tabScores;
+    }
+
+    findMaxScore () {
+        let positionFinal = new Jeton();
+        let highScore = 0;
+        for (let i = 0 ; i < this.scoresAttack.length && i < this.scoresDefense.length ; ++i) {
+            if (this.scoresAttack[i] > this.scoresDefense[i] && this.scoresAttack[i] > highScore) {
+                highScore = this.scoresAttack[i];
+                positionFinal = this.playablePositions[i];
+            }
+            if (this.scoresDefense[i] > this.scoresAttack[i] && this.scoresDefense[i] > highScore) {
+                if (this.scoresDefense[i] > 10) {
+                    highScore = this.scoresDefense[i];
+                    positionFinal = this.playablePositions[i];
+                }
+                else this.getRandomPlayablePos();
+            }
+        }
+        if (highScore === 0) positionFinal = this.getRandomPlayablePos();
+        return positionFinal;
+    }
+
+    placerJetonFromGrid(plateau) {
+        this.playablePositions = this.findPossiblePositions(plateau);
+        this.scoresDefense = this.scoreAssigment(plateau, 0);
+        console.log(this.scoresDefense);
+        this.scoresAttack = this.scoreAssigment(plateau, 1);
+        console.log(this.scoresAttack);
+        this.position = this.findMaxScore();
+        super.placerJetonFromGrid(plateau, this.position.x);
+    }
+}
+
+/*
+placerJetonFromGrid(plateau) {
+        this.playablePositions = this.findPossiblePositions(plateau);
+        this.scores = this.scoreAssigment(plateau, 0);
+        console.log(this.playablePositions);
+        console.log("score defense : " + this.scores);
+        let highScore = 0;
+        for (let i = 0 ; i < this.scores.length ; ++i) {
+            if (this.scores[i] > highScore) {
+                highScore = this.scores[i];
+            }
+        }
+        if (highScore < 60 && highScore > 10) {
+            this.scores = this.scoreAssigment(plateau, 1);
+        }
+        console.log(this.scores);
+        this.position = this.findMaxScore();
+        super.placerJetonFromGrid(plateau, this.position.x);
     }
 
     findMaxScore () {
@@ -84,15 +144,7 @@ class PlayerIA extends Player {
                 positionFinal = this.playablePositions[i];
             }
         }
+        if (maxScore === 0) positionFinal = this.getRandomPlayablePos();
         return positionFinal;
     }
-
-    placerJetonFromGrid(plateau) {
-        console.log(plateau);
-        this.playablePositions = this.findPossiblePositions(plateau);
-        this.scores = this.scoreAssigment(plateau);
-        this.position = this.findMaxScore();
-        console.log(this.position.x);
-        super.placerJetonFromGrid(plateau, this.position.x);
-    }
-}
+ */
