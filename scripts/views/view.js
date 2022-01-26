@@ -35,7 +35,7 @@ class View {
         const ay = 1;
         let vy = 0;
         let currY = 0;
-        let bounce = 1;
+        let bounce = 3;
         let bounced = false;
         const handler = setInterval(function () {
             if(bounce <= 0) {
