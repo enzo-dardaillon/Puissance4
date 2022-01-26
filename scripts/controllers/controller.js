@@ -47,15 +47,7 @@ class Controller {
     }
 
     botTurn(player) {
-        //console.log(this.plateau);
-        player.placerJetonFromGrid(this.plateau);
-        this.view.afficherGrille(this.plateau);
-
-        this.detectWin();
-
-        if(this.gameRunning) {
-            this.nextTurn();
-        }
+        player.placerJetonFromGrid(this.plateau, this.view, this.testApresPlacement.bind(this));
     }
 
     nextTurn() {
@@ -81,12 +73,16 @@ class Controller {
             const x = event.clientX - rect.left;
             //let y = event.clientY - rect.top;
 
-            //this.getCurrentPlayer().placerJetonFromPixel(this.plateau, x);
-            this.view.animationJetonFromPixel(this.plateau,
+            if(this.plateau.getCaseDispo(x) !== -1){
+                this.getCurrentPlayer().placerJetonFromPixel(this.plateau, x, this.view, this.testApresPlacement.bind(this));
+            } else {
+                this.gameLock = false;
+            }
+            /*this.view.animationJetonFromPixel(this.plateau,
                 x,
                 this.plateau.getCaseDispo(x)*CANVAS_HEIGHT/7,
                 this.getCurrentPlayer(),
-                this.testApresPlacement.bind(this));
+                this.testApresPlacement.bind(this));*/
         }
     }
 

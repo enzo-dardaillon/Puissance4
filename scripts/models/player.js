@@ -2,7 +2,6 @@ class Player {
     id;
     color;
     isIA;
-    animationHandler;
 
     constructor(id, color) {
         this.id = id;
@@ -14,38 +13,24 @@ class Player {
         return this.color;
     }
 
-    /**
-     *
-     * @param plateau est le plateau de jeu sur lequel placer le jeton
-     * @param x est la colonne sur laquelle on dépose le jeton
-     */
-    placerJetonFromPixel(plateau, x) {
-        let i = 0;
-        while(plateau.grille[plateau.getCol(x)][i] === 2 && i <= 10) {
-            i++;
-        }
-
-        this.animationHandler = setInterval(this.animationJeton, 10, plateau, x, i, 0, 0);
-
-        if(i !== 0) {
-            plateau.grille[plateau.getCol(x)][i-1] = this.id;
-        }
+    placerJetonFromPixel(plateau, x, view, callback) {
+        this.placerJetonFromGrid(plateau, plateau.getCol(x), view, callback);
     }
 
-    animationJeton(plateau, x, destY, currY) {
-        if(destY === currY) clearInterval(this.animationHandler);
-
-        currY--;
-    }
-
-    placerJetonFromGrid(plateau, x) {
+    placerJetonFromGrid(plateau, x, view, callback) {
         let i = 0;
         while(plateau.grille[x][i] === 2 && i <= 10) {
             i++;
         }
 
-        if(i !== 0) {
-            plateau.grille[x][i-1] = this.id;
+        if(i !== 0){
+            view.animationJetonFromPixel(plateau,
+                x*(CANVAS_WIDTH/7)+CANVAS_WIDTH/7,
+                plateau.getCaseDispoFromGrid(x)*CANVAS_HEIGHT/7,
+                this,
+                callback);
+
+            //plateau.grille[x][i-1] = this.id;
         }
     }
 }

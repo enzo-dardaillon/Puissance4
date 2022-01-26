@@ -41,7 +41,8 @@ class View {
             if(bounce <= 0) {
                 //currY = destY - this.circleRadius + this.yoffset;
                 this.clearScreen();
-                player.placerJetonFromPixel(plateau, x+1);
+                //player.placerJetonFromPixel(plateau, x+1);
+                plateau.grille[plateau.getCol(x+1)][plateau.getRow(destY)+1] = player.id;
                 clearInterval(handler);
                 callback();
             } else if(!bounced && currY >= destY) {

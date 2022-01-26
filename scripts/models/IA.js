@@ -104,14 +104,14 @@ class PlayerIA extends Player {
         return positionFinal;
     }
 
-    placerJetonFromGrid(plateau) {
+    placerJetonFromGrid(plateau, view, callback) {
         this.playablePositions = this.findPossiblePositions(plateau);
         this.scoresDefense = this.scoreAssigment(plateau, 0);
         console.log(this.scoresDefense);
         this.scoresAttack = this.scoreAssigment(plateau, 1);
         console.log(this.scoresAttack);
         this.position = this.findMaxScore();
-        super.placerJetonFromGrid(plateau, this.position.x);
+        super.placerJetonFromGrid(plateau, this.position.x, view, callback);
     }
 }
 
