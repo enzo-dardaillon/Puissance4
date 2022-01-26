@@ -7,6 +7,9 @@ class Controller {
     gameRunning;
     blinkHolder;
     gameLock = false;
+    finishAnimationCount;
+    finishAnimationCounter;
+    finishAnimationHandler;
 
     constructor(plateau, view) {
         this.plateau = plateau;
@@ -149,5 +152,25 @@ class Controller {
         this.gameRunning = false;
         document.getElementById("subtitle").innerText =
             idPlayerWin === 0 ? "Victoire du joueur jaune !" : "Victoire du joueur rouge !";
+
+        for (let x = 0; x < 7; x++) {
+            for (let y = 0; y < 6; y++) {
+                if(this.plateau.grille[x][y] !== 2 && this.plateau.grille[x][y] !== idPlayerWin) {
+                    this.view.retirerJetonFromGrid(this.plateau, x, y, this.stopFinishAnimation.bind(this));
+                    this.finishAnimationCount++;
+                }
+            }
+        }
+
+        this.finishAnimationHandler = setInterval(function () {
+            this.view.afficherGrille(this.plateau);
+        }.bind(this), 20);
+    }
+
+    stopFinishAnimation() {
+        this.finishAnimationCounter++;
+        if(this.finishAnimationCounter >= this.finishAnimationCount) {
+            clearInterval(this.finishAnimationHandler);
+        }
     }
 }

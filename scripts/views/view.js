@@ -35,7 +35,7 @@ class View {
         const ay = 1;
         let vy = 0;
         let currY = 0;
-        let bounce = 3;
+        let bounce = 1;
         let bounced = false;
         const handler = setInterval(function () {
             if(bounce <= 0) {
@@ -58,6 +58,33 @@ class View {
             }
             this.afficherJetonFromPixel(plateau, x, currY, player.getColor());
         }.bind(this), 10);
+    }
+
+    retirerJetonFromGrid(plateau, x, y, callback){
+        console.log(x + " || " + y);
+        const color = plateau.grille[x][y] === 0 ? "#FFFF00" : "#FF0000";
+        plateau.grille[x][y] = 2;
+
+        let currY = y*(CANVAS_HEIGHT/7);
+        let currX = x*(CANVAS_WIDTH/7);
+        const handler = setInterval(function () {
+            if(currY >= CANVAS_HEIGHT+2*this.circleRadius) {
+                clearInterval(handler);
+                //callback();
+            } else {
+                currY+=2;
+                this.tkt(plateau, currX, currY, color);
+            }
+        }.bind(this), 10);
+    }
+
+    tkt(plateau, x, y, color) {
+        //this.afficherGrille(plateau);
+
+        this.context.beginPath();
+        this.context.arc(x+this.circleRadius+this.xoffset, y+this.circleRadius+this.yoffset, this.circleRadius, 0, 2 * Math.PI, undefined);
+        this.context.fillStyle = color;
+        this.context.fill();
     }
 
     afficherJetonFromPixel(plateau, x, y, color) {
