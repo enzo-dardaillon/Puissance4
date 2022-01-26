@@ -10,6 +10,10 @@ class Player {
         this.isIA = false;
     }
 
+    getColor() {
+        return this.color;
+    }
+
     /**
      * TODO Intégrer une animation ???
      * @param plateau est le plateau de jeu sur lequel placer le jeton

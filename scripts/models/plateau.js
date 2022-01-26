@@ -113,4 +113,15 @@ class Plateau {
     getCaseFromGrid(x, y) {
         return this.grille[x][y];
     }
+
+    getCaseDispo(x) {
+        let i = 0;
+        while(this.grille[this.getCol(x)][i] === 2 && i <= 10) {
+            i++;
+        }
+
+        if(i !== 0) {
+            return i;
+        }
+    }
 }

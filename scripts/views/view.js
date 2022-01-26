@@ -26,13 +26,45 @@ class View {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
+    animationJetonFromPixel(plateau, x, destY, player) {
+        x = round(x, CANVAS_WIDTH/7, 0) - CANVAS_WIDTH/7;
+        /*console.log(destY);
+        destY = round(destY, CANVAS_HEIGHT/7, 0) - 2*(CANVAS_HEIGHT/7);
+        console.log(destY);*/
+
+        const ay = 1;
+        let vy = 0;
+        let currY = 0;
+        let bounce = 3;
+        let bounced = false;
+        const handler = setInterval(function () {
+            if(bounce <= 0) {
+                //currY = destY - this.circleRadius + this.yoffset;
+                this.clearScreen();
+                player.placerJetonFromPixel(plateau, x+1);
+                clearInterval(handler);
+            } else if(!bounced && currY >= destY) {
+                vy = -vy/1.25;
+                vy+=ay;
+                currY+=vy;
+                bounce--;
+                bounced = true;
+            } else {
+                bounced = false;
+                vy+=ay;
+                currY+=vy;
+            }
+            this.afficherJetonFromPixel(plateau, x, currY, player.getColor());
+        }.bind(this), 10);
+    }
+
     afficherJetonFromPixel(plateau, x, y, color) {
+        this.afficherGrille(plateau);
+
         this.context.beginPath();
         this.context.arc(x+this.circleRadius+this.xoffset, y+this.circleRadius+this.yoffset, this.circleRadius, 0, 2 * Math.PI, undefined);
         this.context.fillStyle = color;
         this.context.fill();
-
-        this.afficherGrille(plateau);
     }
 
     afficherJetonFromGrid(plateau, x, y, color) {
