@@ -9,7 +9,7 @@ window.onload = function () {
 
     app = new Controller(new Plateau(), new View(document.getElementById("mycanvas")));
 
-    app.init();
+    //app.init();
 
     document.getElementById("button_reset").onclick = function (event) {
         app.init();
