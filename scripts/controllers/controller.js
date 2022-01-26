@@ -40,6 +40,8 @@ class Controller {
         document.getElementById("subtitle").innerText = "Jeu en cours";
         this.gameRunning = true;
         this.display();
+
+        if(this.getCurrentPlayer().isIA) this.botTurn(this.getCurrentPlayer());
     }
 
     display() {
